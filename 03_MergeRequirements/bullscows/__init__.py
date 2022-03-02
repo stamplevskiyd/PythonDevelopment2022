@@ -8,7 +8,7 @@ def bullscows(guess: str, secret: str) -> (int, int):
     return bulls, cows
 
 
-def gameplay(ask: callable, inform: callable, words: list[str]) -> int:
+def gameplay(ask: callable, inform: callable, words) -> int:
     random.seed()
     attempts = 0
     secret = random.choice(words)
@@ -21,10 +21,10 @@ def gameplay(ask: callable, inform: callable, words: list[str]) -> int:
     return attempts
 
 
-def ask(prompt: str, valid: list[str] = None) -> str:
+def ask(prompt: str, valid = None) -> str:
     answer = input(prompt)
     if valid is not None:
-        while not answer in valid:
+        while answer not in valid:
             answer = input(prompt)
     return answer
 
