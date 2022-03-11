@@ -63,5 +63,36 @@ class Name_cmd(cmd.Cmd):
         else:
             self.lang = arg.lower()  # проверка будет при вызове генераторов, а не здесь
 
+    def do_exit(self, arg):
+        return True
+
+    def complete_language(self, prefix, allcomand, beg, end):
+        return [s for s in ('RU', 'EN', 'NATIVE') if s.startswith(prefix.upper())]
+
+    def complete_info(self, prefix, allcomand, beg, end):
+        args = shlex.split(allcomand)
+        if len(args) == 2:  # info и начало префикса:
+            allowed_races = inspect.getmembers(pynames.generators)[1][1]
+            return [s for s in allowed_races if s.startswith(prefix)]
+        else:
+            return [s for s in ('language', 'male', 'female') if s.startswith(prefix)]
+
+    def complete_generate(self, prefix, allcomand, beg, end):
+        args = shlex.split(allcomand)
+        if len(args) == 2:  # generate и начало префикса:
+            allowed_races = inspect.getmembers(pynames.generators)[1][1]
+            return [s for s in allowed_races if s.startswith(prefix)]
+        elif len(args) == 3:
+            race = args[1]
+            start_line = 'pynames.generators.' + race
+            base = eval(start_line)
+            members_list = [elem[0] for elem in inspect.getmembers(base) if
+                            elem[0].endswith("Generator")
+                            and elem[0] != 'FromListGenerator']
+            suggestions_list = ['male', 'female'] + members_list
+            return [elem for elem in suggestions_list if elem.startswith(prefix)]
+        elif len(args) == 4:
+            return [elem for elem in ('male', 'female') if elem.startswith(prefix)]
+
 
 Name_cmd().cmdloop()
