@@ -8,6 +8,7 @@ from pynames import GENDER, LANGUAGE
 
 class Name_cmd(cmd.Cmd):
     prompt = '> '
+    lang = 'native'
 
     def get_args(self, arg):  # распаковка аргументов и нужные параметры примерно одинаковые
         args = shlex.split(arg)
@@ -40,9 +41,10 @@ class Name_cmd(cmd.Cmd):
         generator_object, gender = Name_cmd.get_args(self, arg)
         if not gender:  # по умолчанию
             gender = 'male'
-        gender_str = 'GENDER.' + gender.upper()
-        print(generator_object.get_name(eval(gender_str)))
-
+        config_str = 'GENDER.' + gender.upper()
+        if self.lang in generator_object.languages:
+            config_str += ', LANGUAGE.' + self.lang.upper()
+        print(generator_object.get_name_simple(*eval(config_str)))
 
     def do_info(self, arg):
         generator_object, parameter = Name_cmd.get_args(self, arg)
@@ -55,7 +57,11 @@ class Name_cmd(cmd.Cmd):
             else:
                 print(generator_object.get_names_number())
 
-
+    def do_language(self, arg):
+        if len(shlex.split(arg)) > 1:
+            print("Impossible to set few languages")
+        else:
+            self.lang = arg.lower()  # проверка будет при вызове генераторов, а не здесь
 
 
 Name_cmd().cmdloop()
