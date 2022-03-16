@@ -43,25 +43,19 @@ if len(sys.argv) == 3:
     module_2_name = sys.argv[2]
 module_1 = importlib.import_module(module_1_name)
 functions_1 = find_functions(module_1, module_1_name)
-processed_functions_1 = []
+processed_functions = []
 res = []  # нужна сортировка, так бы без этого
 for fun in functions_1:
-    processed_functions_1.append(rewrite_function(fun))
+    processed_functions.append(rewrite_function(fun))
 if len(sys.argv) == 3:
     module_2 = importlib.import_module(module_2_name)
     functions_2 = find_functions(module_2, module_2_name)
-    processed_functions_2 = []
     for fun in functions_2:
-        processed_functions_2.append(rewrite_function(fun))
-    for i in range(len(processed_functions_1)):
-        for j in range(len(processed_functions_2)):
-            if (r := SequenceMatcher(None, processed_functions_1[i][1], processed_functions_2[j][1]).ratio()) > 0.95:
-                res.append(f"{processed_functions_1[i][0]} {processed_functions_2[j][0]}, {r}")  # почему-то здесь на сайте нет двоеточия
-else:
-    for i in range(len(processed_functions_1)):
-        for j in range(i + 1, len(processed_functions_1)):
-            if (r := SequenceMatcher(None, processed_functions_1[i][1], processed_functions_1[j][1]).ratio()) > 0.95:
-                res.append(f"{processed_functions_1[i][0]} : {processed_functions_1[j][0]}, {r}")
+        processed_functions.append(rewrite_function(fun))
+for i in range(len(processed_functions)):
+    for j in range(i + 1, len(processed_functions)):
+        if SequenceMatcher(None, processed_functions[i][1], processed_functions[j][1]).ratio() > 0.95:
+            res.append(f"{processed_functions[i][0]} : {processed_functions[j][0]}")
 res.sort()
 for line in res:
     print(line)
