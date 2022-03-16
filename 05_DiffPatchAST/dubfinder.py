@@ -3,6 +3,7 @@ import ast
 import inspect
 import sys
 from textwrap import dedent
+from difflib import SequenceMatcher
 
 
 def find_functions(obj, path):
@@ -26,11 +27,11 @@ if len(sys.argv) == 3:
     module_2_name = sys.argv[2]
 module_1 = importlib.import_module(module_1_name)
 functions = find_functions(module_1, module_1_name)
+processed_functions = []
 for fun in functions:
     code = dedent(inspect.getsource(fun[1]))
     tree = ast.parse(code)
     nodes = ast.walk(tree)
-    #new_nodes = []
     for node in nodes:
         if hasattr(node, "id"):
             node.id = "_"
@@ -40,5 +41,8 @@ for fun in functions:
             node.arg = "_"
         elif hasattr(node, "attr"):
             node.attr = "_"
-    print(ast.unparse(tree))
-
+    processed_functions.append((fun[0], ast.unparse(tree)))
+for i in range(len(processed_functions)):
+    for j in range(i + 1, len(processed_functions)):
+        if SequenceMatcher(None, processed_functions[i][1], processed_functions[j][1]).ratio() > 0.95:
+            print(f"{processed_functions[i][0]} : {processed_functions[j][0]}")
